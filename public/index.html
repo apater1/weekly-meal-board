@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Weekly Meal Board</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Shared meal planning</p>
+          <h1>
+            <span>Two weeks of meals,</span>
+            <span>organized by week, day, and date</span>
+          </h1>
+          <p class="hero-copy">
+            The schedule lives in a shared SQLite database so everyone sees the same meal plan. People can suggest
+            changes for individual breakfast, lunch, or dinner entries, and editors can update a full day directly.
+          </p>
+        </div>
+        <div class="hero-card">
+          <p class="hero-card-label">Live schedule</p>
+          <strong id="liveStatus">Connecting...</strong>
+          <span id="scheduleWindow">Loading dates...</span>
+          <span id="scheduleCount">14 day entries</span>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="content-column">
+          <section class="panel panel-wide featured-panel">
+            <div class="panel-header">
+              <div>
+                <h2>Today&apos;s menu</h2>
+                <p id="todayLabel">The current day&apos;s meals appear first.</p>
+              </div>
+            </div>
+            <div id="todayRoot" class="today-root"></div>
+          </section>
+
+          <section class="panel panel-wide">
+            <div class="panel-header">
+              <div>
+                <h2>Weekly schedule</h2>
+                <p>Each week is grouped into dated day cards with breakfast, lunch, and dinner.</p>
+              </div>
+              <button id="refreshSchedule" class="secondary-button" type="button">Refresh</button>
+            </div>
+            <div id="scheduleRoot" class="schedule-root"></div>
+          </section>
+
+          <section class="panel panel-wide">
+            <div class="panel-header">
+              <div>
+                <h2>Incoming suggestions</h2>
+                <p>Review pending ideas and apply them when they are ready.</p>
+              </div>
+            </div>
+            <div id="suggestionList" class="suggestion-list"></div>
+          </section>
+        </section>
+
+        <aside class="sidebar">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2 id="editorTitle">Edit a day</h2>
+                <p>Select a day card to edit the date and meals.</p>
+              </div>
+            </div>
+
+            <form id="mealForm" class="stacked-form">
+              <input type="hidden" id="mealEntryId" />
+              <label>
+                Date
+                <input id="mealDate" name="meal_date" type="date" required />
+              </label>
+              <label>
+                Breakfast
+                <textarea id="breakfast" name="breakfast" rows="3" required></textarea>
+              </label>
+              <label>
+                Lunch
+                <textarea id="lunch" name="lunch" rows="3" required></textarea>
+              </label>
+              <label>
+                Dinner
+                <textarea id="dinner" name="dinner" rows="3" required></textarea>
+              </label>
+              <div class="form-actions">
+                <button class="primary-button" type="submit">Save day</button>
+                <button id="cancelEdit" class="ghost-button" type="button">Clear</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Make a suggestion</h2>
+                <p>Choose a day and meal slot, then propose a change.</p>
+              </div>
+            </div>
+
+            <form id="suggestionForm" class="stacked-form">
+              <label>
+                Your name
+                <input id="suggestionAuthor" name="author" type="text" placeholder="Anonymous" />
+              </label>
+              <label>
+                Suggestion type
+                <select id="suggestionType" name="type">
+                  <option value="update">Update meal</option>
+                  <option value="add">Add meal</option>
+                  <option value="remove">Remove meal</option>
+                </select>
+              </label>
+              <label>
+                Day
+                <select id="suggestionEntryId" name="meal_entry_id"></select>
+              </label>
+              <label>
+                Meal slot
+                <select id="suggestionSlot" name="meal_slot">
+                  <option value="breakfast">Breakfast</option>
+                  <option value="lunch">Lunch</option>
+                  <option value="dinner">Dinner</option>
+                </select>
+              </label>
+              <label>
+                Suggested change
+                <input id="suggestionTitle" name="title" type="text" placeholder="Proposed replacement meal" required />
+              </label>
+              <label>
+                Details
+                <textarea
+                  id="suggestionDetails"
+                  name="details"
+                  rows="4"
+                  placeholder="Explain why the meal should change or what you want to add."
+                ></textarea>
+              </label>
+              <div class="form-actions">
+                <button class="primary-button" type="submit">Submit suggestion</button>
+              </div>
+            </form>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <template id="dayTemplate">
+      <article class="day-card">
+        <div class="day-card-head">
+          <div>
+            <p class="day-meta"></p>
+            <h3 class="day-title"></h3>
+          </div>
+          <button type="button" class="secondary-button edit-day-button">Edit day</button>
+        </div>
+        <div class="meal-list"></div>
+      </article>
+    </template>
+
+    <template id="mealRowTemplate">
+      <div class="meal-row">
+        <div>
+          <span class="meal-label"></span>
+          <p class="meal-text"></p>
+        </div>
+        <button type="button" class="ghost-button suggest-meal-button">Suggest</button>
+      </div>
+    </template>
+
+    <template id="suggestionTemplate">
+      <article class="suggestion-card">
+        <div class="suggestion-top">
+          <div>
+            <p class="suggestion-meta"></p>
+            <h3 class="suggestion-title"></h3>
+          </div>
+          <span class="status-pill"></span>
+        </div>
+        <p class="suggestion-details"></p>
+        <div class="menu-card-footer">
+          <span class="suggestion-author"></span>
+          <div class="card-actions">
+            <button type="button" class="secondary-button accept-button">Apply</button>
+            <button type="button" class="ghost-button reject-button">Reject</button>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

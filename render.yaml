@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: weekly-meal-board
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 10000
+    disk:
+      name: meal-data
+      mountPath: /app/data
+      sizeGB: 1
