@@ -9,8 +9,6 @@
   --accent: #b55a22;
   --accent-strong: #8b4213;
   --accent-soft: #fde7d7;
-  --success-soft: #e4f1e8;
-  --success-text: #29613e;
   --shadow: 0 20px 60px rgba(60, 42, 20, 0.12);
   --radius: 22px;
 }
@@ -209,6 +207,15 @@ h1 span {
 .featured-panel .day-card {
   border-color: rgba(181, 90, 34, 0.24);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(253, 231, 215, 0.7));
+}
+
+.featured-panel .day-card .day-meta,
+.featured-panel .day-card .day-title {
+  color: var(--accent-strong);
+}
+
+.featured-panel .day-card .meal-row {
+  border-top-color: rgba(181, 90, 34, 0.14);
 }
 
 .featured-panel .day-card .secondary-button {

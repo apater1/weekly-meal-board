@@ -12,19 +12,20 @@
         <div>
           <p class="eyebrow">Shared meal planning</p>
           <h1>
-            <span>Two weeks of meals,</span>
-            <span>organized by week, day, and date</span>
+            <span>A year of meals,</span>
+            <span>rotating through a two-week cycle</span>
           </h1>
           <p class="hero-copy">
-            The schedule lives in a shared SQLite database so everyone sees the same meal plan. People can suggest
-            changes for individual breakfast, lunch, or dinner entries, and editors can update a full day directly.
+            The schedule lives in a shared SQLite database so everyone sees the same meal plan. The 14-day menu
+            pattern repeats across the full year, and people can suggest changes for individual breakfast, lunch, or
+            dinner entries.
           </p>
         </div>
         <div class="hero-card">
           <p class="hero-card-label">Live schedule</p>
           <strong id="liveStatus">Connecting...</strong>
           <span id="scheduleWindow">Loading dates...</span>
-          <span id="scheduleCount">14 day entries</span>
+          <span id="scheduleCount">Loading day entries...</span>
         </div>
       </header>
 
@@ -43,8 +44,8 @@
           <section class="panel panel-wide">
             <div class="panel-header">
               <div>
-                <h2>Weekly schedule</h2>
-                <p>Each week is grouped into dated day cards with breakfast, lunch, and dinner.</p>
+                <h2>Yearly schedule</h2>
+                <p>Each calendar week is grouped into dated day cards with breakfast, lunch, and dinner.</p>
               </div>
               <button id="refreshSchedule" class="secondary-button" type="button">Refresh</button>
             </div>

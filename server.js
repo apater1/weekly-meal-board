@@ -12,136 +12,110 @@ const dataDir = path.join(__dirname, 'data');
 const dbPath = path.join(dataDir, 'menu.db');
 const port = Number(process.env.PORT || 3000);
 const host = process.env.HOST || '0.0.0.0';
-const schemaVersion = '2';
+const schemaVersion = '4';
+const scheduleYear = new Date().getFullYear();
 
-const seedSchedule = [
+const cycleMeals = [
   {
-    week_number: 1,
-    day_number: 1,
-    day_name: 'Monday',
-    meal_date: '2026-06-01',
     breakfast: 'Oatmeal with banana and peanut butter',
-    lunch: 'Turkey and avocado wrap',
-    dinner: 'Sheet-pan chicken, potatoes, and broccoli',
+    lunch: 'Φακές.',
+    dinner: 'Τσιπούρα με πατάτες στο φούρνο, arugula με τομάτες και αγγούρι.',
   },
   {
-    week_number: 1,
-    day_number: 2,
-    day_name: 'Tuesday',
-    meal_date: '2026-06-02',
     breakfast: 'Greek yogurt with berries and granola',
     lunch: 'Leftover chicken bowl',
     dinner: 'Spaghetti with marinara and side salad',
   },
   {
-    week_number: 1,
-    day_number: 3,
-    day_name: 'Wednesday',
-    meal_date: '2026-06-03',
     breakfast: 'Scrambled eggs and toast',
     lunch: 'Hummus, cucumber, and pita',
     dinner: 'Taco bowls with rice, beans, and ground turkey',
   },
   {
-    week_number: 1,
-    day_number: 4,
-    day_name: 'Thursday',
-    meal_date: '2026-06-04',
     breakfast: 'Smoothie with spinach, banana, and yogurt',
     lunch: 'Leftover taco bowl',
-    dinner: 'Salmon, rice, and green beans',
+    dinner: 'Beef burger, cheese, tomatoes, onions in brioche bread.',
   },
   {
-    week_number: 1,
-    day_number: 5,
-    day_name: 'Friday',
-    meal_date: '2026-06-05',
     breakfast: 'Overnight oats with apple and cinnamon',
-    lunch: 'Chicken salad sandwich',
-    dinner: 'Vegetable stir-fry with tofu or chicken',
+    lunch: 'Gigantes (leftovers)',
+    dinner: 'Κολοκυθόπιτα με πράσινο κολοκύθι.',
   },
   {
-    week_number: 1,
-    day_number: 6,
-    day_name: 'Saturday',
-    meal_date: '2026-06-06',
     breakfast: 'Eggs, fruit, and toast',
     lunch: 'Leftover stir-fry',
     dinner: 'Homemade pizza with salad',
   },
   {
-    week_number: 1,
-    day_number: 7,
-    day_name: 'Sunday',
-    meal_date: '2026-06-07',
     breakfast: 'Pancakes and fruit',
     lunch: 'Soup and grilled cheese',
     dinner: 'Roast chicken, carrots, and mashed potatoes',
   },
   {
-    week_number: 2,
-    day_number: 8,
-    day_name: 'Monday',
-    meal_date: '2026-06-08',
     breakfast: 'Oatmeal with berries',
-    lunch: 'Leftover roast chicken sandwich',
-    dinner: 'Chicken curry with rice',
+    lunch: 'Κοτόπουλο με πράσινα φασολάκια και πατάτες στην κατσαρόλα.',
+    dinner: 'Τσιπούρες.',
   },
   {
-    week_number: 2,
-    day_number: 9,
-    day_name: 'Tuesday',
-    meal_date: '2026-06-09',
-    breakfast: 'Yogurt parfait',
-    lunch: 'Quinoa salad with chickpeas',
-    dinner: 'Turkey burgers with sweet potato fries',
+    breakfast: 'Omelette, almonds, croissants.',
+    lunch: 'Κοτόπουλο με πράσινα φασολάκια και πατάτες στην κατσαρόλα. (leftovers)',
+    dinner: 'Σουβλάκια κοτόπουλο και τηγανιτές πατάτες.',
   },
   {
-    week_number: 2,
-    day_number: 10,
-    day_name: 'Wednesday',
-    meal_date: '2026-06-10',
     breakfast: 'Avocado toast with eggs',
     lunch: 'Leftover turkey burger salad',
     dinner: 'Pasta primavera with chicken or shrimp',
   },
   {
-    week_number: 2,
-    day_number: 11,
-    day_name: 'Thursday',
-    meal_date: '2026-06-11',
     breakfast: 'Smoothie and toast',
     lunch: 'Tuna salad wrap',
     dinner: 'Chili with cornbread',
   },
   {
-    week_number: 2,
-    day_number: 12,
-    day_name: 'Friday',
-    meal_date: '2026-06-12',
     breakfast: 'Overnight oats',
     lunch: 'Leftover chili',
     dinner: 'Baked cod, rice, and asparagus',
   },
   {
-    week_number: 2,
-    day_number: 13,
-    day_name: 'Saturday',
-    meal_date: '2026-06-13',
     breakfast: 'Breakfast burrito',
     lunch: 'Veggie and cheese quesadilla',
     dinner: 'Beef or bean fajitas',
   },
   {
-    week_number: 2,
-    day_number: 14,
-    day_name: 'Sunday',
-    meal_date: '2026-06-14',
     breakfast: 'French toast and fruit',
     lunch: 'Leftover fajitas',
     dinner: 'Big salad with protein and crusty bread',
   },
 ];
+
+const weekdayFormatter = new Intl.DateTimeFormat('en-US', {
+  weekday: 'long',
+  timeZone: 'UTC',
+});
+
+const generateYearSchedule = (year) => {
+  const days = [];
+  const start = Date.UTC(year, 0, 1);
+  const end = Date.UTC(year + 1, 0, 1);
+
+  for (let index = 0, timestamp = start; timestamp < end; timestamp += 86_400_000, index += 1) {
+    const date = new Date(timestamp);
+    const cycle = cycleMeals[index % cycleMeals.length];
+    const mealDate = date.toISOString().slice(0, 10);
+
+    days.push({
+      week_number: Math.floor(index / 7) + 1,
+      day_number: index + 1,
+      day_name: weekdayFormatter.format(date),
+      meal_date: mealDate,
+      breakfast: cycle.breakfast,
+      lunch: cycle.lunch,
+      dinner: cycle.dinner,
+    });
+  }
+
+  return days;
+};
 
 await mkdir(dataDir, { recursive: true });
 
@@ -159,14 +133,7 @@ const ensureTables = () => {
   `);
 
   const currentVersion = db.prepare(`SELECT value FROM app_meta WHERE key = ?`).get('schema_version')?.value;
-
-  if (currentVersion !== schemaVersion) {
-    db.exec(`
-      DROP TABLE IF EXISTS suggestions;
-      DROP TABLE IF EXISTS meal_entries;
-      DROP TABLE IF EXISTS menu_items;
-    `);
-  }
+  const storedYear = db.prepare(`SELECT value FROM app_meta WHERE key = ?`).get('schedule_year')?.value;
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS meal_entries (
@@ -198,9 +165,11 @@ const ensureTables = () => {
   `);
 
   db.prepare(`INSERT OR REPLACE INTO app_meta (key, value) VALUES (?, ?)`).run('schema_version', schemaVersion);
+  db.prepare(`INSERT OR REPLACE INTO app_meta (key, value) VALUES (?, ?)`).run('schedule_year', String(scheduleYear));
 
   const count = db.prepare(`SELECT COUNT(*) AS count FROM meal_entries`).get().count;
-  if (count === 0 || currentVersion !== schemaVersion) {
+  const schedule = generateYearSchedule(scheduleYear);
+  if (count === 0) {
     const insert = db.prepare(`
       INSERT INTO meal_entries (week_number, day_number, day_name, meal_date, breakfast, lunch, dinner)
       VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -208,7 +177,7 @@ const ensureTables = () => {
 
     db.exec('BEGIN');
     try {
-      for (const entry of seedSchedule) {
+      for (const entry of schedule) {
         insert.run(
           entry.week_number,
           entry.day_number,
@@ -217,6 +186,34 @@ const ensureTables = () => {
           entry.breakfast,
           entry.lunch,
           entry.dinner,
+        );
+      }
+      db.exec('COMMIT');
+    } catch (error) {
+      db.exec('ROLLBACK');
+      throw error;
+    }
+    return;
+  }
+
+  if (currentVersion !== schemaVersion || storedYear !== String(scheduleYear) || count !== schedule.length) {
+    const update = db.prepare(`
+      UPDATE meal_entries
+      SET week_number = ?, day_name = ?, meal_date = ?, breakfast = ?, lunch = ?, dinner = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE day_number = ?
+    `);
+
+    db.exec('BEGIN');
+    try {
+      for (const entry of schedule) {
+        update.run(
+          entry.week_number,
+          entry.day_name,
+          entry.meal_date,
+          entry.breakfast,
+          entry.lunch,
+          entry.dinner,
+          entry.day_number,
         );
       }
       db.exec('COMMIT');
