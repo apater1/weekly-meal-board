@@ -3,7 +3,8 @@
 A shareable meal-planning webpage with:
 
 - separate HTML, CSS, and JavaScript files
-- a SQLite database that stores the two-week meal schedule
+- a SQLite database that stores a year-round meal schedule
+- a two-week meal cycle that repeats through the full year
 - day-level editing plus suggestions for breakfast, lunch, and dinner entries
 
 ## Run it
@@ -14,32 +15,13 @@ node server.js
 
 Then open `http://localhost:3000`.
 
-## Update the running server
-
-On a Raspberry Pi or any other Linux host, you can update the app with one command from inside the repo:
-
-```bash
-./scripts/update.sh
-```
-
-That script does two things:
-
-1. pulls the latest changes from `origin/main`
-2. restarts the app if it is managed by a systemd service named `weekly-meal-board.service`
-
-If you use a different service name, set `SERVICE_NAME` when you run the script:
-
-```bash
-SERVICE_NAME=meal-board.service ./scripts/update.sh
-```
-
-If the repo is running under Docker Compose instead, the script will rebuild and restart the stack when it sees a Compose file.
-
 ## Data
 
 The database is created automatically at `data/menu.db`.
 
-The first run imports the two-week schedule and organizes it into:
+The first run imports the two-week schedule and repeats it across the full year.
+
+The schedule is organized into:
 
 - Week 1: June 1, 2026 through June 7, 2026
 - Week 2: June 8, 2026 through June 14, 2026
